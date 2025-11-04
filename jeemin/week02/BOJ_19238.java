@@ -8,6 +8,7 @@ import java.util.*;
 public class BOJ_19238 {
     static int n;
     static int m;
+    static int fuel;
     static int[][] map;
     static int[] start;
     static int[][][] dest;
@@ -17,7 +18,7 @@ public class BOJ_19238 {
 
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
-        int fuel = Integer.parseInt(st.nextToken());
+        fuel = Integer.parseInt(st.nextToken());
 
         dest = new int[n][n][2];
 
@@ -30,9 +31,9 @@ public class BOJ_19238 {
         }
         st = new StringTokenizer(br.readLine());
         // 택시 시작 위치
-        start = new int[]{Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken())};
+        start = new int[]{Integer.parseInt(st.nextToken()) - 1, Integer.parseInt(st.nextToken()) - 1};
 
-        // 승객 위치
+        // 승객 출발지, 목적지 위치
         for (int i = 0; i < n; i++) {   // -1로 초기화
             for (int j = 0; j < n; j++) {
                 dest[i][j][0] = -1;
@@ -41,16 +42,41 @@ public class BOJ_19238 {
         }
         for (int i = 0; i < m; i++) {
             st = new StringTokenizer(br.readLine());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-            int d = Integer.parseInt(st.nextToken());
+            int a = Integer.parseInt(st.nextToken()) - 1;
+            int b = Integer.parseInt(st.nextToken()) - 1;
+            int c = Integer.parseInt(st.nextToken()) - 1;
+            int d = Integer.parseInt(st.nextToken()) - 1;
             dest[a][b][0] = c;
             dest[a][b][1] = d;
         }
 
-        int answer = BFS(start, fuel);
-        System.out.println(answer);
+        int cnt = 0;
+        while (cnt < m) {
+            // 승객 찾기
+            ArrayList<int[]> passLocs = BFS(start);
+            if (passLocs == null) {
+                System.out.println(-1);
+                return;
+            }
+            if (!passLocs.isEmpty()) {
+                passLocs.sort((a, b) -> {
+                    if (a[0] == b[0]) return a[1] - b[1];
+                    return a[0] - b[0];
+                });
+            }
+            int[] pass = passLocs.get(0);
+            cnt++;
+            // 승객 -> 목적지
+            if (!findDist(pass, dest[pass[0]][pass[1]])) {
+                System.out.println(-1);
+                return;
+            }
+
+            start = dest[pass[0]][pass[1]];
+            dest[pass[0]][pass[1]] = new int[]{-1, -1};
+        }
+
+        System.out.println(fuel);
         return;
     }
 
@@ -63,60 +89,80 @@ public class BOJ_19238 {
     };
 
     // 승객찾는 BFS
-    public static int BFS(int[] start, int fuel) {
+    public static ArrayList<int[]> BFS(int[] start) {
         int[][] visited = new int[n][n];
         Queue<int[]> q = new LinkedList<>();
-        q.add(new int[]{start[0], start[1], fuel});
+        q.add(new int[]{start[0], start[1], 0});
         visited[start[0]][start[1]] = 1;
-
+        ArrayList<int[]> passengers = new ArrayList<>();
+        int minDist = 1600;
         while (!q.isEmpty()) {
             int[] now = q.poll();
             int[] loc = new int[]{now[0], now[1]};
-            // 연료 없을 경우 패스
-            if (now[2] < 0) return -1;
-            // 승객 위치일 경우 목적지까지 거리 찾기
-            if (dest[loc[0]][loc[1]][0] != -1) {
-                findDist(loc, dest[loc[0]][loc[1]], now[2]);
-                return fuel;
+
+            // 가장 가까운 승객들의 위치
+            if (dest[loc[0]][loc[1]][0] != -1 && now[2] <= minDist) {
+                minDist = now[2];
+                passengers.add(loc);
+            }
+            if (now[2] > minDist) {
+                // 연료 없을 경우 패스
+                if (fuel - now[2] < 0) return null;
+
+                fuel -= minDist;    //   연료 차감
+                return passengers;
             }
 
             for (int[] dir : dirct) {
                 int x = now[0] + dir[0];
                 int y = now[1] + dir[1];
                 // 방문한적 없는 경우 탐색
-                if (x >= 0 && x < n && y >= 0 && y < m && map[x][y] == 0 && visited[x][y] == 0) {
-                    q.add(new int[]{x, y, now[2] - 1});
+                if (x >= 0 && x < n && y >= 0 && y < n && map[x][y] == 0 && visited[x][y] == 0) {
+                    q.add(new int[]{x, y, now[2] + 1});
+                    visited[x][y] = 1;
                 }
             }
         }
+        if (!passengers.isEmpty()) {
+            if (fuel - minDist < 0) return null;
+            fuel -= minDist;
+            return passengers;
+        }
+
+        return null;
     }
 
     // 목적지 찾는 BFS
-    public static void findDist(int[] start, int[] end, int fuel) {
+    public static boolean findDist(int[] start, int[] end) {
         int[][] visited = new int[n][n];
         Queue<int[]> q2 = new LinkedList<>();
-        // 시작 행, 시작 열, 거리
+        // 시작 행, 시작 열, 이동거리
         q2.add(new int[]{start[0], start[1], 0});
         visited[start[0]][start[1]] = 1;
         while (!q2.isEmpty()) {
             int[] now = q2.poll();
             int[] loc = new int[]{now[0], now[1]};
-            // 연료 부족시
-            if (now[2] < 0) break;
+
             // 목적지 도달시
             if (Arrays.equals(loc, end)) {
-                BFS(loc, fuel + now[2] * 2);
-                break;
+                // 연료 부족시
+                if (fuel - now[2] < 0) {
+                    return false;
+                }
+                fuel += now[2];
+                return true;
             }
 
             for (int[] dir : dirct) {
                 int x = now[0] + dir[0];
                 int y = now[1] + dir[1];
 
-                if (x >= 0 && x < n && y >= 0 && y < m && visited[x][y] == 0) {
-                    q2.add(new int[]{x, y, now[2] - 1});
+                if (x >= 0 && x < n && y >= 0 && y < n && map[x][y] == 0 && visited[x][y] == 0) {
+                    q2.add(new int[]{x, y, now[2] + 1});
+                    visited[x][y] = 1;
                 }
             }
         }
+        return false;
     }
 }
