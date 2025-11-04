@@ -33,6 +33,7 @@ public class PG_신규아이디추천 {
             String last = String.valueOf(new_id.charAt(new_id.length() - 1));
             new_id += last.repeat(3 - new_id.length());
         }
+
         return new_id;
     }
 }
