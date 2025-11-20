@@ -1,4 +1,4 @@
-package donguk;
+package donguk.week02;
 
 import java.util.ArrayList;
 import java.util.Arrays;

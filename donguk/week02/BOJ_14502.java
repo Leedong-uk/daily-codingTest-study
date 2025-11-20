@@ -1,4 +1,4 @@
-package donguk;
+package donguk.week02;
 
 import java.io.BufferedReader;
 import java.io.IOException;
