@@ -3,7 +3,9 @@ package donguk;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class BOJ_구슬탈출 {
@@ -37,6 +39,52 @@ public class BOJ_구슬탈출 {
     // 경로를 탐색하는게 아니라 최단 횟수를 탐색한다
     // 즉 bfs 는 보드 칸을 탐색하는게 아니라 상태 를 탐색한다
     static int solution(int[]R , int[]B) {
+        Queue<int[]> q = new ArrayDeque<>();
+        boolean[][][][] visited = new boolean[N][M][N][M];
+
+        q.add(new int[]{R[0], R[1], B[0], B[1], 0});
+        visited[R[0]][R[1]][B[0]][B[1]] = true;
+
+        while (!q.isEmpty()) {
+            int[] curr = q.poll();
+            int Rr = curr[0], Rc = curr[1];
+            int Br = curr[2], Bc = curr[3];
+            int depth = curr[4];
+
+            if (depth >= 10) continue;
+
+            for (int d = 0; d < 4; d++) {
+
+                // R, B 다음 위치 새로 생성
+                int[] nextR = new int[2];
+                nextR[0] = Rr;
+                nextR[1] = Rc;
+
+                int[] nextB = new int[2];
+                nextB[0] = Br;
+                nextB[1] = Bc;
+
+                boolean redHole = false;
+                boolean blueHole = false;
+
+                // 기울이기
+                tilt(nextR, nextB, d);
+
+                // 구멍 체크
+                if (board[nextR[0]][nextR[1]] == 'O') redHole = true;
+                if (board[nextB[0]][nextB[1]] == 'O') blueHole = true;
+
+                if (blueHole) continue;
+                if (redHole) return depth + 1;
+
+                if (!visited[nextR[0]][nextR[1]][nextB[0]][nextB[1]]) {
+                    visited[nextR[0]][nextR[1]][nextB[0]][nextB[1]] = true;
+                    q.add(new int[]{nextR[0], nextR[1], nextB[0], nextB[1], depth + 1});
+                }
+            }
+
+            }
+        return -1;
 
     }
 
@@ -79,8 +127,6 @@ public class BOJ_구슬탈출 {
         }
 
     }
-
-
 
     /*
          현재 움직이는 공(cur) 을 움직인다
