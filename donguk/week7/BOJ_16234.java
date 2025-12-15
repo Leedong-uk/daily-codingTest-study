@@ -7,6 +7,11 @@ import java.util.*;
 
 /*
 한번 시행 할때 0 번부터 끝까지 한칸 한칸 다 bfs 해야하네
+
+몰랐던 부분
+1. bfs 를 전체 다 시행 해야한다는것
+2. 아깝다 연합처리 하는거 똑같이 생각했었는데
+3. solution 함수 ..
  */
 public class BOJ_16234 {
     static int N , L, R , result;
