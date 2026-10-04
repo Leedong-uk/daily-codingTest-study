@@ -1,36 +1,70 @@
 package donguk.프로그래머스.lv3;
-
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class 여행경로 {
     static class Solution{
-        public String[] solution(String[][] tickets) {
-            String[] answer = {};
-            Deque<String> dq = new ArrayDeque<>();
-            HashMap<String, ArrayList<String>> dic = new HashMap<>();
+        String[] answer = {};
+        HashMap<String, ArrayList<String[]>> dic;
+        boolean[] visited ;
+        ArrayList<String> tmp;
 
-            for(String[] ticket : tickets){
+        public String[] solution(String[][] tickets) {
+
+            dic = new HashMap<>();
+            visited = new boolean[tickets.length];
+            tmp = new ArrayList<>();
+
+            for(int i = 0 ; i< tickets.length;i++){
+                String[] ticket = tickets[i];
+
                 String from = ticket[0];
                 String to = ticket[1];
+
                 dic.putIfAbsent(from, new ArrayList<>());
-                dic.get(from).add(to);
+                dic.get(from).add(new String[]{to, String.valueOf(i)});
             }
+
+
+            for (ArrayList<String[]> list : dic.values()) {
+                Collections.sort(list, (a, b) -> a[0].compareTo(b[0]));
+            }
+
+            tmp.add("ICN");
+            dfs("ICN", tickets);
 
             return answer;
         }
 
-        public boolean dfs(int cnt , String[][] tickets){
-            if(cnt == tickets.length){
-                //여기서 결과 담고
-                return true ;
-            }
-            // 가능한 항공권 선택
-            // visited로 백트래킹
 
+        public boolean dfs (String start,String[][]tickets){
+            if(tmp.size() == tickets.length + 1){
+                answer = tmp.toArray(new String[0]);
+                return true;
+            }
+
+            if (!dic.containsKey(start)) {
+                return false;
+            }
+
+            for(String[] node :dic.get(start)){
+                String next = node[0];
+                int idx = Integer.parseInt(node[1]);
+
+                if(visited[idx])
+                    continue;
+
+                visited[idx] = true;
+                tmp.add(next);
+
+                if(dfs(next,tickets))
+                    return true;
+
+                visited[idx] = false;
+                tmp.remove(tmp.size() - 1);
+            }
             return false;
         }
     }
@@ -40,7 +74,7 @@ public class 여행경로 {
         String[][] tickets2 = {{"ICN", "SFO"}, {"ICN", "ATL"}, {"SFO", "ATL"}, {"ATL", "ICN"}, {"ATL","SFO"}};
 
         Solution sol = new Solution();
-        System.out.println(Arrays.toString(sol.solution(tickets1)));
+//        System.out.println(Arrays.toString(sol.solution(tickets1)));
         System.out.println(Arrays.toString(sol.solution(tickets2)));
     }
 }
