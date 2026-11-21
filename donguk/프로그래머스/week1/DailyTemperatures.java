@@ -1,11 +1,36 @@
 package donguk.프로그래머스.week1;
 
 import java.util.Arrays;
+import java.util.Stack;
 
 public class DailyTemperatures {
     static class Solution {
         public int[] dailyTemperatures(int[] temperatures) {
-            int[] result = {};
+            int[] result = new int[temperatures.length];
+            Stack<Integer> stack = new Stack<>();
+
+            for(int i = 0 ; i<temperatures.length;i++){
+                if (stack.isEmpty()) {
+                    stack.push(i);
+                    continue;
+                }
+
+                if (temperatures[stack.peek()] >= temperatures[i]) {
+                    stack.push(i);
+                }
+                else {
+                    while(!stack.isEmpty() && temperatures[stack.peek()] < temperatures[i]){
+                        int top = stack.pop();
+                        result[top] = i - top;
+                    }
+                    stack.push(i);
+                }
+            }
+
+            while(!stack.isEmpty()){
+                int tmp = stack.pop();
+                result[tmp] = 0;
+            }
 
             return result;
         }
