@@ -3,7 +3,7 @@ package donguk.프로그래머스.PCCP.문자열;
 public class 문자열압축 {
     static class Solution {
         public int solution(String s) {
-            int answer = Integer.MAX_VALUE;
+            int answer = s.length();
             StringBuilder result;
 
             for (int i = 1; i < s.length() / 2 + 1; i++) {
