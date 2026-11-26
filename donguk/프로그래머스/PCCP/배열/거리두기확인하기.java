@@ -32,7 +32,7 @@ public class 거리두기확인하기 {
                 }
 
                 for (int[] s : start) {
-                    // P마다 초기화
+
                     q = new ArrayDeque<>();
                     visited = new boolean[place.length][place[0].length()];
                     map = new int[place.length][place[0].length()];
@@ -70,7 +70,6 @@ public class 거리두기확인하기 {
                             }
                         }
 
-                        // P 발견 시 BFS 종료
                         if (flag)
                             break;
                     }
@@ -79,7 +78,6 @@ public class 거리두기확인하기 {
                         break;
                 }
 
-                // 대기실마다 결과 하나만 저장
                 tmp.add(flag ? 0 : 1);
             }
 
