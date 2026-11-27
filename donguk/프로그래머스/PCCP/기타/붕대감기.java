@@ -1,4 +1,4 @@
-package donguk.프로그래머스.PCCP;
+package donguk.프로그래머스.PCCP.기타;
 
 import java.util.Collections;
 import java.util.HashMap;

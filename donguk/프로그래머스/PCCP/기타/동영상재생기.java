@@ -1,4 +1,4 @@
-package donguk.프로그래머스.PCCP;
+package donguk.프로그래머스.PCCP.기타;
 
 public class 동영상재생기 {
     static class Solution{
