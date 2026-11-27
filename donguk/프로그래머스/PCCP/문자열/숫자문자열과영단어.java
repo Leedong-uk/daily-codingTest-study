@@ -39,6 +39,15 @@ public class 숫자문자열과영단어 {
             answer = Integer.parseInt(result.toString());
             return answer;
         }
+
+        public int betterVersion(String s ){
+            int answer = 0;
+            String[] words = {"zero","one","two","three","four","five","six","seven","eight","nine"};
+            for(int i = 0 ; i<10; i++){
+                s=s.replace(words[i],String.valueOf(i));
+            }
+            answer = Integer.parseInt(s);return answer;
+        }
     }
 
     public static void main(String[] args){
